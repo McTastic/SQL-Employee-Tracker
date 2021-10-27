@@ -18,7 +18,7 @@ const promptInit = () =>{
             type:"list",
             name: "start",
             message: "What would you like to do?",
-            choices: ["View All Departments", "View All Roles", "View All Employees", "Add a Department", "Add a Role", "Add an Employee", "Update Employee Role"],
+            choices: ["View All Departments", "View All Roles", "View All Employees", "Add a Department", "Add a Role", "Add an Employee", "Update Employee Role", "Delete an Employee"],
         },
     ])
     .then((data)=>{
@@ -49,6 +49,10 @@ const promptInit = () =>{
 
             case "Update Employee Role": 
             promptUpdateEmployee();
+            break;
+
+            case "Delete an Employee": 
+            promptDeleteEmployee();
             break;
         }
     })
@@ -230,7 +234,6 @@ const promptUpdateEmployee = () =>{
         }
     ])
     .then((data)=>{
-        //TODO Add data to table
         const roleID = roleList.indexOf(data.roles) + 1
         const employeeID = employeeList.indexOf(data.employees) + 1
         db.query(`UPDATE employee SET role_id=${roleID} WHERE id = ${employeeID}`, (err,result) =>{
@@ -241,6 +244,49 @@ const promptUpdateEmployee = () =>{
         })
     });
 };
+// ****Delete function*** Commented out because it doesn't fully work
+
+// const promptDeleteEmployee = () => {
+//     let employeeList = [];
+//     db.query(`SELECT first_name, last_name FROM employee;`, (err,result) =>{
+//         if(err){
+//             console.log(err);
+//         }
+//         result.map((employee)=> {
+//            employeeList.push(`${employee.first_name} ${employee.last_name}`)
+//         });
+//         return employeeList;
+//     });
+//     return inquirer
+//     .prompt([
+//         {
+//             type: "confirm",
+//             name: "confirm",
+//             message: "Please note this will permanently delete an employee. Continue?"
+//         },
+//         {
+//             type: "list",
+//             name: "employees",
+//             message: "Which employee would you like to delete?",
+//             when: (data)=> data.confirm === true,
+//             choices: employeeList
+//         }
+//     ])
+//     .then((data)=>{
+//         if(data.confirm === false){
+//             promptInit();
+//          }
+//         const employeeID = employeeList.indexOf(data.employees) + 1
+//         console.log(employeeID)
+//         db.query("DELETE FROM employee WHERE id =?",employeeID, (err,result)=>{
+//             if(err){
+//                 console.log(err);
+//             }
+//             viewEmployees();
+//         });
+//     });
+// };
+
 const viewDepartments = ()=>{
      db.query("SELECT * FROM department;",
      (err, result)=>{
