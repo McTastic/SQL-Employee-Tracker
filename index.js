@@ -26,6 +26,7 @@ const promptInit = () => {
           "Add a Role",
           "Add an Employee",
           "Update Employee Role",
+        //   "Delete an Employee"
         ],
       },
     ])
