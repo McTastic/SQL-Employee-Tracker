@@ -18,7 +18,7 @@ const promptInit = () =>{
             type:"list",
             name: "start",
             message: "What would you like to do?",
-            choices: ["View All Departments", "View All Roles", "View All Employees", "Add a Department", "Add a Role", "Add an Employee", "Update Employee Role", "Delete an Employee"],
+            choices: ["View All Departments", "View All Roles", "View All Employees", "Add a Department", "Add a Role", "Add an Employee", "Update Employee Role",] 
         },
     ])
     .then((data)=>{
@@ -51,9 +51,9 @@ const promptInit = () =>{
             promptUpdateEmployee();
             break;
 
-            case "Delete an Employee": 
-            promptDeleteEmployee();
-            break;
+            // case "Delete an Employee": 
+            // promptDeleteEmployee();
+            // break;
         }
     })
 };
