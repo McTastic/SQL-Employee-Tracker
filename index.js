@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
+const util = require("util");
 
 const db = mysql.createConnection(
   {
@@ -10,6 +11,7 @@ const db = mysql.createConnection(
   },
   console.log("Connected to the employees_db database.")
 );
+db.query = util.promisify(db.query);
 
 const promptInit = () => {
   return inquirer
@@ -26,7 +28,7 @@ const promptInit = () => {
           "Add a Role",
           "Add an Employee",
           "Update Employee Role",
-        //   "Delete an Employee"
+          "Delete an Employee",
         ],
       },
     ])
@@ -60,9 +62,9 @@ const promptInit = () => {
           promptUpdateEmployee();
           break;
 
-        // case "Delete an Employee":
-        // promptDeleteEmployee();
-        // break;
+        case "Delete an Employee":
+          promptDeleteEmployee();
+          break;
       }
     });
 };
@@ -280,48 +282,37 @@ const promptUpdateEmployee = () => {
       );
     });
 };
-// ****Delete function*** Commented out because it doesn't fully work
 
-// const promptDeleteEmployee = () => {
-//     let employeeList = [];
-//     db.query(`SELECT first_name, last_name FROM employee;`, (err,result) =>{
-//         if(err){
-//             console.log(err);
-//         }
-//         result.map((employee)=> {
-//            employeeList.push(`${employee.first_name} ${employee.last_name}`)
-//         });
-//         return employeeList;
-//     });
-//     return inquirer
-//     .prompt([
-//         {
-//             type: "confirm",
-//             name: "confirm",
-//             message: "Please note this will permanently delete an employee. Continue?"
-//         },
-//         {
-//             type: "list",
-//             name: "employees",
-//             message: "Which employee would you like to delete?",
-//             when: (data)=> data.confirm === true,
-//             choices: employeeList
-//         }
-//     ])
-//     .then((data)=>{
-//         if(data.confirm === false){
-//             promptInit();
-//          }
-//         const employeeID = employeeList.indexOf(data.employees) + 1
-//         console.log(employeeID)
-//         db.query("DELETE FROM employee WHERE id =?",employeeID, (err,result)=>{
-//             if(err){
-//                 console.log(err);
-//             }
-//             viewEmployees();
-//         });
-//     });
-// };
+const promptDeleteEmployee = async () => {
+  let employeeList
+  try {
+    const result = await db.query(
+      `SELECT first_name, last_name, id FROM employee;`
+    );
+     employeeList = await result.map((employee) => ({
+      name: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id,
+     }));
+  } catch (error) {
+    console.log(error);
+  }
+
+  const data = await inquirer.prompt([
+    {
+      type: "list",
+      name: "employee",
+      message: "Which employee would you like to delete?",
+      choices: employeeList,
+    },
+  ]);
+  console.log(data.employee);
+  db.query("DELETE FROM employee WHERE id =?", data.employee, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    viewEmployees();
+  });
+};
 
 const viewDepartments = () => {
   db.query("SELECT * FROM department;", (err, result) => {
